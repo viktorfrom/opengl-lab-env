@@ -7,9 +7,6 @@
     <Filter Include="Render">
       <UniqueIdentifier>{484178d4-73d1-4f8b-8109-919cf08330bf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="App2D">
-      <UniqueIdentifier>{e3aae8bd-3447-4411-b0b0-fbb8e4ac4678}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\engine\core\app.cc">
@@ -21,9 +18,6 @@
     <ClCompile Include="..\engine\config.cc">
       <Filter>Core</Filter>
     </ClCompile>
-    <ClCompile Include="..\engine\2d\2dapp.cc">
-      <Filter>App2D</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\engine\core\app.h">
@@ -34,9 +28,6 @@
     </ClInclude>
     <ClInclude Include="..\engine\config.h">
       <Filter>Core</Filter>
-    </ClInclude>
-    <ClInclude Include="..\engine\2d\2dapp.h">
-      <Filter>App2D</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -5,6 +5,11 @@
 #include "config.h"
 #include "exampleapp.h"
 #include <cstring>
+#include <glm/glm.hpp>
+#include <glm/vec3.hpp> // glm::vec3
+#include <glm/vec4.hpp> // glm::vec4
+#include <glm/mat4x4.hpp> // glm::mat4
+#include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
 const GLchar* vs =
 "#version 430\n"
@@ -76,7 +81,7 @@ ExampleApp::Open()
 
 		// setup vertex shader
 		this->vertexShader = glCreateShader(GL_VERTEX_SHADER);
-		GLint length = std::strlen(vs);
+		GLint length = (GLint)std::strlen(vs);
 		glShaderSource(this->vertexShader, 1, &vs, &length);
 		glCompileShader(this->vertexShader);
 
@@ -93,7 +98,7 @@ ExampleApp::Open()
 
 		// setup pixel shader
 		this->pixelShader = glCreateShader(GL_FRAGMENT_SHADER);
-		length = std::strlen(ps);
+		length = (GLint)std::strlen(ps);
 		glShaderSource(this->pixelShader, 1, &ps, &length);
 		glCompileShader(this->pixelShader);
 

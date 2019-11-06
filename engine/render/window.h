@@ -3,13 +3,13 @@
 /**
 	Manages the opening and closing of a window.
 	
-	(C) 2015-2017 Individual contributors, see AUTHORS file
+	(C) 2015-2018 Individual contributors, see AUTHORS file
 */
 //------------------------------------------------------------------------------
 #include <functional>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <nanovg.h>
+#include <string>
 
 namespace Display
 {
@@ -23,10 +23,10 @@ public:
 
 	/// set size of window
 	void SetSize(int32 width, int32 height);
+	/// get size of windows
+	void GetSize(int32 & width, int32 & height);
 	/// set title of window
 	void SetTitle(const std::string& title);
-	/// get size
-	void GetSize(int32 & width, int32 & height);
 
 	/// open window
 	bool Open();
@@ -53,14 +53,12 @@ public:
 	void SetMouseEnterLeaveFunction(const std::function<void(bool)>& func);
 	/// set mouse scroll function callback
 	void SetMouseScrollFunction(const std::function<void(float64, float64)>& func);
+    /// set window resize function callback
+    void SetWindowResizeFunction(const std::function<void(int32, int32)>& func);
 
 	/// set optional UI render function
 	void SetUiRender(const std::function<void()>& func);
-	/// set optional nanovg render function
-	void SetNanoVGRender(const std::function<void(NVGcontext *)> & func);
-	/// access to nanovg context for setup
-	NVGcontext* GetNanoVG();
-
+	
 private:
 
 	/// static key press callback
@@ -73,6 +71,8 @@ private:
 	static void StaticMouseEnterLeaveCallback(GLFWwindow* win, int32 mode);
 	/// static mouse scroll callback
 	static void StaticMouseScrollCallback(GLFWwindow* win, float64 x, float64 y);
+    /// static resize window callback
+    static void StaticWindowResizeCallback(GLFWwindow* win, int32 x, int32 y);
 
 	/// resize update
 	void Resize();
@@ -91,17 +91,15 @@ private:
 	std::function<void(bool)> mouseLeaveEnterCallback;
 	/// function for mouse scroll callbacks
 	std::function<void(float64, float64)> mouseScrollCallback;
+    /// function for window resize callbacks
+    std::function<void(int32, int32)> windowResizeCallback;
 	/// function for ui rendering callback
 	std::function<void()> uiFunc;
-	/// function for nanovg rendering callback
-	std::function<void(NVGcontext *)> nanoFunc;
-
-
+	
 	int32 width;
 	int32 height;
 	std::string title;
 	GLFWwindow* window;
-	NVGcontext * vg;
 };
 
 //------------------------------------------------------------------------------
@@ -122,8 +120,10 @@ inline void
 Window::GetSize(int32 & width, int32 & height)
 {
 	width = this->width;
-	height = this->height;	
+	height = this->height;
+
 }
+
 //------------------------------------------------------------------------------
 /**
 */
@@ -192,29 +192,18 @@ Window::SetMouseScrollFunction(const std::function<void(float64, float64)>& func
 /**
 */
 inline void
-Window::SetUiRender(const std::function<void()>& func)
+Window::SetWindowResizeFunction(const std::function<void(int32, int32)>& func)
 {
-	this->uiFunc = func;
+    this->windowResizeCallback = func;
 }
 
 //------------------------------------------------------------------------------
 /**
 */
 inline void
-Window::SetNanoVGRender(const std::function<void(NVGcontext *)> & func)
+Window::SetUiRender(const std::function<void()>& func)
 {
-	this->nanoFunc = func;
+	this->uiFunc = func;
 }
-
-//------------------------------------------------------------------------------
-/**
-*/
-inline NVGcontext*
-Window::GetNanoVG()
-{
-	return this->vg;
-}
-
-
 
 } // namespace Display
