@@ -16,6 +16,10 @@ The lab environment contains two classes, Window and App. Override the App class
 
 This is done by assigning a lambda function to a callback matching the input you require. It is possible to have more than one window open at a time, although one must select which window to render to using the function called Window::MakeCurrent prior to doing any GL calls.
 
+## Common problems
+* Q: Build log says Windows SDK version was not found
+    - A: Right click the project in the solution explorer and click `Retarget projects`, then select a version.
+
 ---
 ---
 
