@@ -10,7 +10,7 @@
 #define STRING_BUFFER_SIZE 8192
 
 const GLchar* vs =
-"#version 430\n"
+"#version 310 es\n"
 "layout(location=0) in vec3 pos;\n"
 "layout(location=1) in vec4 color;\n"
 "layout(location=0) out vec4 Color;\n"
@@ -21,7 +21,7 @@ const GLchar* vs =
 "}\n";
 
 const GLchar* ps =
-"#version 430\n"
+"#version 310 es\n"
 "layout(location=0) in vec4 color;\n"
 "out vec4 Color;\n"
 "void main()\n"
@@ -100,10 +100,6 @@ ImGuiExampleApp::Open()
 			this->RenderUI();
 		});
 
-		this->window->SetNanoVGRender([this](NVGcontext * vg)
-		{
-			this->RenderNano(vg);
-		});
 		return true;
 	}
 	return false;
@@ -249,27 +245,6 @@ ImGuiExampleApp::CompileShaders()
 		printf("[PROGRAM LINK ERROR]: %s", buf);
 		delete[] buf;
 	}
-}
-
-//------------------------------------------------------------------------------
-/**
-*/
-void
-ImGuiExampleApp::RenderNano(NVGcontext * vg)
-{
-	
-	
-	nvgSave(vg);
-
-	nvgBeginPath(vg);
-	nvgCircle(vg,600, 100, 50);
-	NVGpaint paint;
-	paint = nvgLinearGradient(vg, 600, 100, 650, 150, nvgRGBA(255, 0, 0, 255), nvgRGBA(0, 255, 0, 255));
-	nvgFillPaint(vg, paint);
-	nvgFill(vg);
-	
-
-	nvgRestore(vg);
 }
 
 } // namespace Example

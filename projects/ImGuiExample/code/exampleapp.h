@@ -31,9 +31,6 @@ private:
 	/// show some ui things
 	void RenderUI();
 
-	// show some nanovg stuff
-	void RenderNano(NVGcontext * vg);
-
 	GLuint program;
 	GLuint vertexShader;
 	GLuint pixelShader;

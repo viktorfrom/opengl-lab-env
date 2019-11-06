@@ -12,7 +12,8 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 
 const GLchar* vs =
-"#version 430\n"
+"#version 310 es\n"
+"precision mediump float;\n"
 "layout(location=0) in vec3 pos;\n"
 "layout(location=1) in vec4 color;\n"
 "layout(location=0) out vec4 Color;\n"
@@ -23,7 +24,8 @@ const GLchar* vs =
 "}\n";
 
 const GLchar* ps =
-"#version 430\n"
+"#version 310 es\n"
+"precision mediump float;\n"
 "layout(location=0) in vec4 color;\n"
 "out vec4 Color;\n"
 "void main()\n"
