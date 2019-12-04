@@ -28,43 +28,43 @@ namespace Example
 		/// run app
 		void Run();
 	private:
-		std::vector<glm::vec3> vecArr;
-		std::vector<glm::vec3> hull;
-		std::vector<glm::vec3> buf;
-		std::vector<glm::vec3> pointsInsideHull;
-		std::vector<glm::vec3> test;
 
-		//allocates new node 
-		struct node* newNode(int data) {
-			// declare and allocate new node  
-			struct node* node = new struct node();
+		class BSTNode
+		{
+		private:
+			BSTNode* Parent;
+			BSTNode* Left;
+			BSTNode* Middle;
+			BSTNode* Right;
 
-			node->data = data;    // Assign data to this node
+			glm::vec2 c, ci, cm, cj;
+			BSTNode();
+			BSTNode(BSTNode* Parent, BSTNode* Left, BSTNode* Middle, BSTNode* Right, glm::vec2 c, glm::vec2 ci, glm::vec2 cm, glm::vec2 cj);
+		};
 
-			// Initialize left and right children as NULL 
-			node->left = NULL;
-			node->right = NULL;
-			return(node);
-		}
 
+		std::vector<glm::vec2> vecArr;
+		std::vector<glm::vec2> hull;
+		std::vector<glm::vec2> buf;
+		std::vector<glm::vec2> pointsInsideHull;
+		std::vector<glm::vec2> test;
 
 		GLuint program;
 		GLuint vertexShader;
 		GLuint pixelShader;
-		GLuint triangle;
+		GLuint mesh;
 		Display::Window* window;
 		void ExampleApp::readFromFile(std::string fileName);
 		void ExampleApp::insertVec(glm::vec2 point);
 		void ExampleApp::generateRandomPoints(int n);
 		void ExampleApp::terminalInput();
 		void ExampleApp::bufCollinear(int n);
-		std::vector<glm::vec3> ExampleApp::convexHull(std::vector<glm::vec3> inputVector);
-		void ExampleApp::sortVector(std::vector<glm::vec3> &inputVector);
-		GLfloat ExampleApp::collinear(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3);
+		std::vector<glm::vec2> ExampleApp::convexHull(std::vector<glm::vec2> inputVector);
+		void ExampleApp::sortVector(std::vector<glm::vec2> &inputVector);
+		GLfloat ExampleApp::collinear(glm::vec2 point1, glm::vec2 point2, glm::vec2 point3);
 
-		void ExampleApp::calcPointsInsideHull(std::vector<glm::vec3> &inputVector, std::vector<glm::vec3> &inputVector2);
+		void ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &inputVector, std::vector<glm::vec2> &inputVector2);
 
-
-		Node* buildTree(glm::vec3 , const std::vector<glm::vec3>& points, Node* p);
+		void ExampleApp::triangulation(glm::vec2 randomPoint, std::vector<glm::vec2> &inputVector, BSTNode* parent);
 	};
 } // namespace Example

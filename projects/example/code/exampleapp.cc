@@ -26,21 +26,21 @@
 const GLchar* vs =
 "#version 310 es\n"
 "precision mediump float;\n"
-"layout(location=0) in vec3 pos;\n"
+"layout(location=0) in vec2 pos;\n"
 "void main()\n"
 "{\n"
-"	gl_Position = vec4(pos, 1);\n"
+"	gl_Position = vec4(pos, -1, 1);\n"
 "}\n";
 
 const GLchar* ps =
 "#version 310 es\n"
 "precision mediump float;\n"
+"layout(location=0) in vec4 color;\n"
 "out vec4 Color;\n"
 "void main()\n"
 "{\n"
-"	Color = vec4(0,0,0,1);\n"
+"	Color = vec4(0, 0, 0, 1);\n"
 "}\n";
-
 using namespace Display;
 
 namespace Example
@@ -83,7 +83,8 @@ namespace Example
 		inputFile.close();
 	}
 
-	void ExampleApp::generateRandomPoints(int n) {
+	void ExampleApp::generateRandomPoints(int n) 
+	{
 		if (n >= 3) {
 			std::mt19937_64 rng;
 
@@ -105,10 +106,9 @@ namespace Example
 		}
 	}
 
-	void ExampleApp::insertVec(glm::vec2 point) {
-		GLfloat z = -1.0f;
-
-		vecArr.push_back(glm::vec3(point, z));
+	void ExampleApp::insertVec(glm::vec2 point)
+	{
+		vecArr.push_back(point);
 	}
 
 	void ExampleApp::terminalInput() {
@@ -137,13 +137,13 @@ namespace Example
 		};
 	}
 
-	GLfloat ExampleApp::collinear(glm::vec3 point1, glm::vec3 point2, glm::vec3 point3)
+	GLfloat ExampleApp::collinear(glm::vec2 point1, glm::vec2 point2, glm::vec2 point3)
 	{
 		return (point2.x - point1.x) * (point3.y - point1.y) - (point2.y - point1.y) * (point3.x - point1.x);
 	}
 
 
-	std::vector<glm::vec3> ExampleApp::convexHull(std::vector<glm::vec3> inputVector)
+	std::vector<glm::vec2> ExampleApp::convexHull(std::vector<glm::vec2> inputVector)
 	{
 		int n = inputVector.size();
 		int k = 0;
@@ -152,7 +152,7 @@ namespace Example
 			return inputVector;
 		}
 		else {
-			std::vector<glm::vec3> hull(2 * n);
+			std::vector<glm::vec2> hull(2 * n);
 
 			this->sortVector(inputVector);
 
@@ -174,10 +174,10 @@ namespace Example
 	}
 
 
-	void ExampleApp::sortVector(std::vector<glm::vec3> &inputVector)
+	void ExampleApp::sortVector(std::vector<glm::vec2> &inputVector)
 	{
 		std::sort(inputVector.begin(), inputVector.end(),
-			[](const glm::vec3& v1, const glm::vec3& v2) {
+			[](const glm::vec2& v1, const glm::vec2& v2) {
 			if (v1.x == v2.x) {
 				return (v1.y < v2.y);
 			}
@@ -186,7 +186,7 @@ namespace Example
 			}});
 	}
 
-	void ExampleApp::calcPointsInsideHull(std::vector<glm::vec3> &vecArr, std::vector<glm::vec3> &hull)
+	void ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &vecArr, std::vector<glm::vec2> &hull)
 	{
 		pointsInsideHull.clear();
 		for (int i = 0; i < vecArr.size(); i++) {
@@ -197,37 +197,45 @@ namespace Example
 				pointsInsideHull.push_back(vecArr.at(i));
 			};
 		};
+		
 
 		if (!pointsInsideHull.empty()) {
+
 			int Random = std::rand() % pointsInsideHull.size();
 			auto randomPoint = pointsInsideHull[Random];
+			//auto first = hull[0];
+			//auto last = hull[hull.size() - 1];
+			//auto middle = hull[hull.size() / 2];
 
-			pointsInsideHull.clear();
-			test.push_back(randomPoint);
+			this->ExampleApp::triangulation(randomPoint, hull, nullptr);
+
+
+			/*std::cout << "random = " << glm::to_string(random)  << std::endl;
+			std::cout << "first = " << glm::to_string(first) << std::endl;
+			std::cout << "last = " << glm::to_string(last) << std::endl;
+			std::cout << "middle = " << glm::to_string(middle) << std::endl;*/
+
+
 		}
 	}
 
+	void ExampleApp::triangulation(glm::vec2 randomPoint, std::vector<glm::vec2> &inputVector, BSTNode* parent)
+	{
+		if (inputVector.size() == 2) {
+			test.push_back(inputVector[0]);
+			test.push_back(inputVector[1]);
+		}
+		else {
+			auto first = hull[0]; // ci
+			auto last = hull[hull.size() - 1]; // cj
+			auto middle = hull[hull.size() / 2]; // cm
 
 
-	//declaration for new tree node
-	struct node {
-		int data;
-		struct node *left;
-		struct node *right;
-	};
 
-	//allocates new node 
-	struct node* newNode(int data) {
-		// declare and allocate new node  
-		struct node* node = new struct node();
-
-		node->data = data;    // Assign data to this node
-
-		// Initialize left and right children as NULL 
-		node->left = NULL;
-		node->right = NULL;
-		return(node);
+		}
+	
 	}
+
 
 	//------------------------------------------------------------------------------
 	/**
@@ -253,7 +261,7 @@ namespace Example
 
 			}
 			else if (key == 50 && action == GLFW_PRESS) {
-				this->readFromFile("test.txt");
+				this->readFromFile("testFan.txt");
 				buf = vecArr;
 
 				hull = this->ExampleApp::convexHull(vecArr);
@@ -329,8 +337,8 @@ namespace Example
 			}
 
 			// setup vbo
-			glGenBuffers(1, &this->triangle);
-			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+			glGenBuffers(1, &this->mesh);
+			glBindBuffer(GL_ARRAY_BUFFER, this->mesh);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glPointSize(5);
 			return true;
@@ -355,21 +363,21 @@ namespace Example
 		{
 			glClear(GL_COLOR_BUFFER_BIT);
 			this->window->Update();
-			glBindBuffer(GL_ARRAY_BUFFER, this->triangle);
+			glBindBuffer(GL_ARRAY_BUFFER, this->mesh);
 			glUseProgram(this->program);
 			glEnableVertexAttribArray(0);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, NULL);
-			glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (GLvoid*)(sizeof(float32) * 3));
+			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, NULL);
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (GLvoid*)(sizeof(float32) * 2));
 
 
-			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec3), pointsInsideHull.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec2), pointsInsideHull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->pointsInsideHull.size());
 
 			// glDrawArrays(GL_TRIANGLES, 0, this->buf.size());
-			glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec3), hull.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, hull.size() * sizeof(glm::vec2), hull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_LINE_LOOP, 0, this->hull.size());
 			// glDrawArrays(GL_LINE_STRIP, 0, this->buf.size());
-			glBufferData(GL_ARRAY_BUFFER, buf.size() * sizeof(glm::vec3), buf.data(), GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, buf.size() * sizeof(glm::vec2), buf.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->buf.size());
 
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
