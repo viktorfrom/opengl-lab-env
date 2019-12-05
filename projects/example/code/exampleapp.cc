@@ -200,41 +200,53 @@ namespace Example
 		
 
 		if (!pointsInsideHull.empty()) {
-
 			int Random = std::rand() % pointsInsideHull.size();
 			auto randomPoint = pointsInsideHull[Random];
-			//auto first = hull[0];
-			//auto last = hull[hull.size() - 1];
-			//auto middle = hull[hull.size() / 2];
 
-			this->ExampleApp::triangulation(randomPoint, hull, nullptr);
+			auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
-
-			/*std::cout << "random = " << glm::to_string(random)  << std::endl;
-			std::cout << "first = " << glm::to_string(first) << std::endl;
-			std::cout << "last = " << glm::to_string(last) << std::endl;
-			std::cout << "middle = " << glm::to_string(middle) << std::endl;*/
-
+			test.clear();
+			this->ExampleApp::getTriangles(tree);
 
 		}
 	}
 
-	void ExampleApp::triangulation(glm::vec2 randomPoint, std::vector<glm::vec2> &inputVector, BSTNode* parent)
+	// takes parent node, hull and random point inside hull as argument
+	ExampleApp::Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c)
 	{
-		if (inputVector.size() == 2) {
-			test.push_back(inputVector[0]);
-			test.push_back(inputVector[1]);
+		if (hull.size() == 2) {
+			return newNode(parent, nullptr, nullptr, nullptr, hull[0], hull[1], c);
+		} 
+		else {
+		// create new (empty) binary node
+		Node* root = new Node();
+
+		// recursively compute left and right subtree
+		root->left = buildTree(root, std::vector<glm::vec2>(hull.begin(), hull.begin() + hull.size() / 2 + 1), c);
+		root->right = buildTree(root, std::vector<glm::vec2>(hull.begin() + hull.size() / 2, hull.end()), c);
+
+		return root;
+		}
+	}
+
+	void ExampleApp::getTriangles(Node* tree) 
+	{
+		if (tree->left == nullptr && tree->right == nullptr)
+		{
+			// random point inside hull to first point on hull
+			test.push_back(tree->data[1]);
+			test.push_back(tree->data[0]);
+
+			// random point inside hull to second point on hull
+			test.push_back(tree->data[1]);
+			test.push_back(tree->data[2]);
 		}
 		else {
-			auto first = hull[0]; // ci
-			auto last = hull[hull.size() - 1]; // cj
-			auto middle = hull[hull.size() / 2]; // cm
-
-
-
+			ExampleApp::getTriangles(tree->left);
+			ExampleApp::getTriangles(tree->right);
 		}
-	
 	}
+
 
 
 	//------------------------------------------------------------------------------
@@ -369,6 +381,9 @@ namespace Example
 			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, NULL);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (GLvoid*)(sizeof(float32) * 2));
 
+
+			glBufferData(GL_ARRAY_BUFFER, test.size() * sizeof(glm::vec2), test.data(), GL_STATIC_DRAW);
+			glDrawArrays(GL_LINE_LOOP, 0, this->test.size());
 
 			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec2), pointsInsideHull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->pointsInsideHull.size());

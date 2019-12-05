@@ -28,20 +28,30 @@ namespace Example
 		/// run app
 		void Run();
 	private:
-
-		class BSTNode
+		struct Node
 		{
-		private:
-			BSTNode* Parent;
-			BSTNode* Left;
-			BSTNode* Middle;
-			BSTNode* Right;
-
-			glm::vec2 c, ci, cm, cj;
-			BSTNode();
-			BSTNode(BSTNode* Parent, BSTNode* Left, BSTNode* Middle, BSTNode* Right, glm::vec2 c, glm::vec2 ci, glm::vec2 cm, glm::vec2 cj);
+			Node* parent = nullptr;
+			Node* left = nullptr;
+			Node* middle = nullptr;
+			Node* right = nullptr;
+			std::vector<glm::vec2> data;
 		};
 
+		Node* newNode(Node* parent, Node* left, Node* middle, Node* right, glm::vec2 &point1, glm::vec2 &point2, glm::vec2 c)
+		{
+			// Node* node = (Node*)malloc(sizeof(Node));
+			Node* node = new Node();
+			
+			node->data.push_back(point1);
+			node->data.push_back(c);
+			node->data.push_back(point2);
+			// node->data.push_back(point1);
+
+			node->left = left;
+			node->middle = middle;
+			node->right = right;
+			return (node);
+		};
 
 		std::vector<glm::vec2> vecArr;
 		std::vector<glm::vec2> hull;
@@ -62,9 +72,9 @@ namespace Example
 		std::vector<glm::vec2> ExampleApp::convexHull(std::vector<glm::vec2> inputVector);
 		void ExampleApp::sortVector(std::vector<glm::vec2> &inputVector);
 		GLfloat ExampleApp::collinear(glm::vec2 point1, glm::vec2 point2, glm::vec2 point3);
-
 		void ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &inputVector, std::vector<glm::vec2> &inputVector2);
 
-		void ExampleApp::triangulation(glm::vec2 randomPoint, std::vector<glm::vec2> &inputVector, BSTNode* parent);
+		Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c);
+		void ExampleApp::getTriangles(Node* tree);
 	};
 } // namespace Example
