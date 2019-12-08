@@ -186,7 +186,7 @@ namespace Example
 			}});
 	}
 
-	void ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &vecArr, std::vector<glm::vec2> &hull)
+	glm::vec2 ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &vecArr, std::vector<glm::vec2> &hull)
 	{
 		pointsInsideHull.clear();
 		for (int i = 0; i < vecArr.size(); i++) {
@@ -203,11 +203,7 @@ namespace Example
 			int Random = std::rand() % pointsInsideHull.size();
 			auto randomPoint = pointsInsideHull[Random];
 
-			auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
-
-			test.clear();
-			this->ExampleApp::getTriangles(tree);
-
+			return randomPoint;
 		}
 	}
 
@@ -269,7 +265,12 @@ namespace Example
 				buf = vecArr;
 
 				hull = this->ExampleApp::convexHull(vecArr);
-				this->calcPointsInsideHull(vecArr, hull);
+				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
+
+				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+				test.clear();
+				this->ExampleApp::getTriangles(tree);
 
 			}
 			else if (key == 50 && action == GLFW_PRESS) {
@@ -277,10 +278,14 @@ namespace Example
 				buf = vecArr;
 
 				hull = this->ExampleApp::convexHull(vecArr);
-				this->calcPointsInsideHull(vecArr, hull);
+				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
+				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
+				test.clear();
+				this->ExampleApp::getTriangles(tree);
 			}
+
 			else if (key == 49 && action == GLFW_PRESS) {
 				int n = 10;
 				this->generateRandomPoints(n);
@@ -288,8 +293,12 @@ namespace Example
 				buf = vecArr;
 
 				hull = this->ExampleApp::convexHull(vecArr);
-				this->calcPointsInsideHull(vecArr, hull);
+				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
+				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+				test.clear();
+				this->ExampleApp::getTriangles(tree);
 
 
 			}

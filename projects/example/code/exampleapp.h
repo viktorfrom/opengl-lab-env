@@ -59,6 +59,14 @@ namespace Example
 		std::vector<glm::vec2> pointsInsideHull;
 		std::vector<glm::vec2> test;
 
+		std::vector<glm::vec2> leftSide;
+		std::vector<glm::vec2> rightSide;
+
+		std::vector<glm::vec2> leftHull;
+		std::vector<glm::vec2> rightHull;
+
+
+
 		GLuint program;
 		GLuint vertexShader;
 		GLuint pixelShader;
@@ -72,7 +80,7 @@ namespace Example
 		std::vector<glm::vec2> ExampleApp::convexHull(std::vector<glm::vec2> inputVector);
 		void ExampleApp::sortVector(std::vector<glm::vec2> &inputVector);
 		GLfloat ExampleApp::collinear(glm::vec2 point1, glm::vec2 point2, glm::vec2 point3);
-		void ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &inputVector, std::vector<glm::vec2> &inputVector2);
+		glm::vec2 ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &inputVector, std::vector<glm::vec2> &inputVector2);
 
 		Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c);
 		void ExampleApp::getTriangles(Node* tree);
