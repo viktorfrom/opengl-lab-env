@@ -59,15 +59,6 @@ namespace Example
 		std::vector<glm::vec2> pointsInsideHull;
 		std::vector<glm::vec2> test;
 
-		std::vector<glm::vec2> leftSide;
-		std::vector<glm::vec2> rightSide;
-
-
-		std::vector<glm::vec2> testHull;
-		std::vector<glm::vec2> test2;
-
-
-
 		GLuint program;
 		GLuint vertexShader;
 		GLuint pixelShader;
@@ -89,6 +80,8 @@ namespace Example
 		// point location inside triangle
 		GLfloat ExampleApp::triangleArea(glm::vec2 left, glm::vec2 top, glm::vec2 right);
 		bool ExampleApp::isPointInside(glm::vec2 left, glm::vec2 top, glm::vec2 right, glm::vec2 point);
+
+		void ExampleApp::insertPoints(Node* tree);
 
 	};
 } // namespace Example
