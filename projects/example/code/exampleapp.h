@@ -62,8 +62,9 @@ namespace Example
 		std::vector<glm::vec2> leftSide;
 		std::vector<glm::vec2> rightSide;
 
-		std::vector<glm::vec2> leftHull;
-		std::vector<glm::vec2> rightHull;
+
+		std::vector<glm::vec2> testHull;
+		std::vector<glm::vec2> test2;
 
 
 
@@ -84,5 +85,10 @@ namespace Example
 
 		Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c);
 		void ExampleApp::getTriangles(Node* tree);
+
+		// point location inside triangle
+		GLfloat ExampleApp::triangleArea(glm::vec2 left, glm::vec2 top, glm::vec2 right);
+		bool ExampleApp::isPointInside(glm::vec2 left, glm::vec2 top, glm::vec2 right, glm::vec2 point);
+
 	};
 } // namespace Example

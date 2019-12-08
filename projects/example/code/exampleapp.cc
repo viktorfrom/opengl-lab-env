@@ -203,6 +203,9 @@ namespace Example
 			int Random = std::rand() % pointsInsideHull.size();
 			auto randomPoint = pointsInsideHull[Random];
 
+			// remove selected random point from pointsInsideHull
+			pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), randomPoint));
+
 			return randomPoint;
 		}
 	}
@@ -211,7 +214,34 @@ namespace Example
 	ExampleApp::Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c)
 	{
 		if (hull.size() == 2) {
+
+			// check if base case triangle contains points
+			if (!pointsInsideHull.empty()) {
+				for (int i = 0; i < pointsInsideHull.size(); i++) {
+					if (isPointInside(hull[0], hull[1], c, pointsInsideHull[i])) {
+
+						std::cout << "point found " << std::endl;
+						
+
+
+						//parent->left = newNode(parent, nullptr, nullptr, nullptr, hull[1], hull[0], pointsInsideHull[i]);
+						//parent->middle = newNode(parent, nullptr, nullptr, nullptr, pointsInsideHull[i], hull[1], c);
+						//parent->right = newNode(parent, nullptr, nullptr, nullptr, pointsInsideHull[i], hull[1], c);
+
+
+						test2.push_back(pointsInsideHull[i]);
+						test2.push_back(hull[0]);
+
+						test2.push_back(pointsInsideHull[i]);
+						test2.push_back(hull[1]);
+
+						test2.push_back(pointsInsideHull[i]);
+						test2.push_back(c);
+					}
+				}
+			}
 			return newNode(parent, nullptr, nullptr, nullptr, hull[0], hull[1], c);
+
 		} 
 		else {
 		// create new (empty) binary node
@@ -241,6 +271,29 @@ namespace Example
 			ExampleApp::getTriangles(tree->left);
 			ExampleApp::getTriangles(tree->right);
 		}
+	}
+
+	GLfloat ExampleApp::triangleArea(glm::vec2 left, glm::vec2 top, glm::vec2 right)
+	{
+		return abs((left.x*(top.y - right.y) + top.x * (right.y - left.y) + right.x * (left.y - top.y)) / 2.0f);
+	}
+
+	bool ExampleApp::isPointInside(glm::vec2 left, glm::vec2 top, glm::vec2 right, glm::vec2 point)
+	{
+		// calc left-top-right
+		GLfloat A = triangleArea(left, top, right);
+
+		// calc point-top-right
+		GLfloat A1 = triangleArea(point, top, right);
+
+		// calc point-left-right
+		GLfloat A2 = triangleArea(left, point, right);
+
+		// calc point-point-left-top
+		GLfloat A3 = triangleArea(left, top, point);
+
+		// sum of original area = new area
+		return (A == A1 + A2 + A3);
 	}
 
 
@@ -278,9 +331,16 @@ namespace Example
 				buf = vecArr;
 
 				hull = this->ExampleApp::convexHull(vecArr);
-				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
+				// auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
-				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+				// HARDCODED: FOR TESTING
+				pointsInsideHull.clear();
+				pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
+			    pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
+
+				test2.clear();
+				auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
 
 				test.clear();
 				this->ExampleApp::getTriangles(tree);
@@ -295,6 +355,8 @@ namespace Example
 				hull = this->ExampleApp::convexHull(vecArr);
 				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
+
+				test2.clear();
 				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
 				test.clear();
@@ -303,6 +365,7 @@ namespace Example
 
 			}
 		});
+
 
 		if (this->window->Open())
 		{
@@ -393,6 +456,10 @@ namespace Example
 
 			glBufferData(GL_ARRAY_BUFFER, test.size() * sizeof(glm::vec2), test.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_LINE_LOOP, 0, this->test.size());
+
+			glBufferData(GL_ARRAY_BUFFER, test2.size() * sizeof(glm::vec2), test2.data(), GL_STATIC_DRAW);
+			glDrawArrays(GL_LINE_LOOP, 0, this->test2.size());
+
 
 			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec2), pointsInsideHull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->pointsInsideHull.size());
