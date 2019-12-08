@@ -83,7 +83,7 @@ namespace Example
 		inputFile.close();
 	}
 
-	void ExampleApp::generateRandomPoints(int n) 
+	void ExampleApp::generateRandomPoints(int n)
 	{
 		if (n >= 3) {
 			std::mt19937_64 rng;
@@ -178,12 +178,12 @@ namespace Example
 	{
 		std::sort(inputVector.begin(), inputVector.end(),
 			[](const glm::vec2& v1, const glm::vec2& v2) {
-			if (v1.x == v2.x) {
-				return (v1.y < v2.y);
-			}
-			else {
-				return (v1.x < v2.x);
-			}});
+				if (v1.x == v2.x) {
+					return (v1.y < v2.y);
+				}
+				else {
+					return (v1.x < v2.x);
+				}});
 	}
 
 	glm::vec2 ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &vecArr, std::vector<glm::vec2> &hull)
@@ -197,7 +197,7 @@ namespace Example
 				pointsInsideHull.push_back(vecArr.at(i));
 			};
 		};
-		
+
 
 		if (!pointsInsideHull.empty()) {
 			int Random = std::rand() % pointsInsideHull.size();
@@ -220,42 +220,54 @@ namespace Example
 				for (int i = 0; i < pointsInsideHull.size(); i++) {
 					if (isPointInside(hull[0], hull[1], c, pointsInsideHull[i])) {
 
-						std::cout << "point found " << std::endl;
-						
+						//std::cout << "point found " << std::endl;
 
 
-						//parent->left = newNode(parent, nullptr, nullptr, nullptr, hull[1], hull[0], pointsInsideHull[i]);
-						//parent->middle = newNode(parent, nullptr, nullptr, nullptr, pointsInsideHull[i], hull[1], c);
-						//parent->right = newNode(parent, nullptr, nullptr, nullptr, pointsInsideHull[i], hull[1], c);
+						//std::vector<glm::vec2> leftSide;
+
+						//leftSide.push_back(hull[1]);
+						//leftSide.push_back(c);
 
 
-						test2.push_back(pointsInsideHull[i]);
-						test2.push_back(hull[0]);
+						//std::vector<glm::vec2> middleSide;
+						//middleSide.push_back(hull[0]);
+						//middleSide.push_back(hull[1]);
 
-						test2.push_back(pointsInsideHull[i]);
-						test2.push_back(hull[1]);
+						//std::vector<glm::vec2> rightSide;
+						//rightSide.push_back(hull[0]);
+						//rightSide.push_back(c);
 
-						test2.push_back(pointsInsideHull[i]);
-						test2.push_back(c);
+
+						//auto selectedPoint = pointsInsideHull[i];
+
+						//pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[i]));
+
+
+
+						// parent->left = buildTree(parent, middleSide, selectedPoint);
+						// parent->middle = buildTree(parent, middleSide, selectedPoint);
+					    // parent->right = buildTree(parent, rightSide, selectedPoint);
+
+
 					}
 				}
 			}
 			return newNode(parent, nullptr, nullptr, nullptr, hull[0], hull[1], c);
-
-		} 
+			
+		}
 		else {
-		// create new (empty) binary node
-		Node* root = new Node();
+			// create new (empty) binary node
+			Node* root = new Node();
 
-		// recursively compute left and right subtree
-		root->left = buildTree(root, std::vector<glm::vec2>(hull.begin(), hull.begin() + hull.size() / 2 + 1), c);
-		root->right = buildTree(root, std::vector<glm::vec2>(hull.begin() + hull.size() / 2, hull.end()), c);
+			// recursively compute left and right subtree
+			root->left = buildTree(root, std::vector<glm::vec2>(hull.begin(), hull.begin() + hull.size() / 2 + 1), c);
+			root->right = buildTree(root, std::vector<glm::vec2>(hull.begin() + hull.size() / 2, hull.end()), c);
 
-		return root;
+			return root;
 		}
 	}
 
-	void ExampleApp::getTriangles(Node* tree) 
+	void ExampleApp::getTriangles(Node* tree)
 	{
 		if (tree->left == nullptr && tree->right == nullptr)
 		{
@@ -269,6 +281,7 @@ namespace Example
 		}
 		else {
 			ExampleApp::getTriangles(tree->left);
+			// ExampleApp::getTriangles(tree->middle);
 			ExampleApp::getTriangles(tree->right);
 		}
 	}
@@ -309,62 +322,62 @@ namespace Example
 		this->window = new Display::Window;
 		this->window->SetSize(800, 800);
 		window->SetKeyPressFunction([this](int32 key, int32 scancode, int32 action, int32 mods)
-		{
-			if (key == 256 && action == GLFW_PRESS) {
-				this->window->Close();
-			}
-			else if (key == 51 && action == GLFW_PRESS) {
-				this->terminalInput();
-				buf = vecArr;
+			{
+				if (key == 256 && action == GLFW_PRESS) {
+					this->window->Close();
+				}
+				else if (key == 51 && action == GLFW_PRESS) {
+					this->terminalInput();
+					buf = vecArr;
 
-				hull = this->ExampleApp::convexHull(vecArr);
-				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
+					hull = this->ExampleApp::convexHull(vecArr);
+					auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
-				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
-				test.clear();
-				this->ExampleApp::getTriangles(tree);
+					test.clear();
+					this->ExampleApp::getTriangles(tree);
 
-			}
-			else if (key == 50 && action == GLFW_PRESS) {
-				this->readFromFile("testFan.txt");
-				buf = vecArr;
+				}
+				else if (key == 50 && action == GLFW_PRESS) {
+					this->readFromFile("testFan.txt");
+					buf = vecArr;
 
-				hull = this->ExampleApp::convexHull(vecArr);
-				// auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
-
-
-				// HARDCODED: FOR TESTING
-				pointsInsideHull.clear();
-				pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
-			    pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
-
-				test2.clear();
-				auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
-
-				test.clear();
-				this->ExampleApp::getTriangles(tree);
-			}
-
-			else if (key == 49 && action == GLFW_PRESS) {
-				int n = 10;
-				this->generateRandomPoints(n);
-				this->bufCollinear(n);
-				buf = vecArr;
-
-				hull = this->ExampleApp::convexHull(vecArr);
-				auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
+					hull = this->ExampleApp::convexHull(vecArr);
+					// auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
 
-				test2.clear();
-				auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+					// HARDCODED: FOR TESTING
+					pointsInsideHull.clear();
+					pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
+					// pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
 
-				test.clear();
-				this->ExampleApp::getTriangles(tree);
+					test2.clear();
+					auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
+
+					test.clear();
+					this->ExampleApp::getTriangles(tree);
+				}
+
+				else if (key == 49 && action == GLFW_PRESS) {
+					int n = 10;
+					this->generateRandomPoints(n);
+					this->bufCollinear(n);
+					buf = vecArr;
+
+					hull = this->ExampleApp::convexHull(vecArr);
+					auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
 
-			}
-		});
+					test2.clear();
+					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+					test.clear();
+					this->ExampleApp::getTriangles(tree);
+
+
+				}
+			});
 
 
 		if (this->window->Open())

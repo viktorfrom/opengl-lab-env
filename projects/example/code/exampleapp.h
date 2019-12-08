@@ -41,7 +41,7 @@ namespace Example
 		{
 			// Node* node = (Node*)malloc(sizeof(Node));
 			Node* node = new Node();
-			
+
 			node->data.push_back(point1);
 			node->data.push_back(c);
 			node->data.push_back(point2);
