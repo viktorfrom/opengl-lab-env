@@ -54,10 +54,12 @@ namespace Example
 		};
 
 		std::vector<glm::vec2> vecArr;
-		std::vector<glm::vec2> hull;
 		std::vector<glm::vec2> buf;
+
+		std::vector<glm::vec2> hull;
 		std::vector<glm::vec2> pointsInsideHull;
-		std::vector<glm::vec2> test;
+		std::vector<glm::vec2> triangleMesh;
+
 
 		GLuint program;
 		GLuint vertexShader;
