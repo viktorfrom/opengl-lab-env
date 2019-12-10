@@ -137,6 +137,9 @@ namespace Example
 		};
 	}
 
+
+	// if the return value is 0 the third point is collinear to the first two
+	// if the return value is positive the third point is to the 'left', negative it is to the 'right'
 	GLfloat ExampleApp::collinear(glm::vec2 point1, glm::vec2 point2, glm::vec2 point3)
 	{
 		return (point2.x - point1.x) * (point3.y - point1.y) - (point2.y - point1.y) * (point3.x - point1.x);
@@ -196,8 +199,7 @@ namespace Example
 			else {
 				pointsInsideHull.push_back(vecArr.at(i));
 			};
-		};
-
+		}
 
 		if (!pointsInsideHull.empty()) {
 			std::srand(std::time(NULL));
@@ -211,16 +213,19 @@ namespace Example
 		}
 	}
 
-	// takes parent node, hull and random point inside hull as argument
 	ExampleApp::Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c)
 	{
 		if (hull.size() == 2) {
-			return newNode(parent, nullptr, nullptr, nullptr, hull[0], hull[1], c);
+			return leafNode(parent, nullptr, nullptr, nullptr, c, hull[0], hull[1]);
 			
 		}
 		else {
-			// create new (empty) binary node
-			Node* root = new Node();
+			auto c_i = hull[0];
+			auto c_m = hull[hull.size() / 2];
+			auto c_j = hull[hull.size() - 1];
+
+			// create new parent binary node
+			Node* root = binaryNode(parent, nullptr, nullptr, nullptr, c, c_i, c_m, c_j);
 
 			// recursively compute left and right subtree
 			root->left = buildTree(root, std::vector<glm::vec2>(hull.begin(), hull.begin() + hull.size() / 2 + 1), c);
@@ -235,71 +240,83 @@ namespace Example
 		if (tree->left == nullptr && tree->right == nullptr && tree->middle == nullptr)
 		{
 
-			triangleMesh.push_back(tree->data[1]);
-			triangleMesh.push_back(tree->data[0]);
+			//triangleMesh.push_back(tree->data[1]);
+			//triangleMesh.push_back(tree->data[0]);
 
+			//triangleMesh.push_back(tree->data[1]);
+			//triangleMesh.push_back(tree->data[2]);
+
+			//triangleMesh.push_back(tree->data[0]);
+			//triangleMesh.push_back(tree->data[2]);
+
+			// for triangles 
+			triangleMesh.push_back(tree->data[0]);
 			triangleMesh.push_back(tree->data[1]);
 			triangleMesh.push_back(tree->data[2]);
-
-			triangleMesh.push_back(tree->data[0]);
-			triangleMesh.push_back(tree->data[2]);
-
-
-			//test.push_back(tree->data[0]);
-			//test.push_back(tree->data[1]);
-			//test.push_back(tree->data[2]);
-			//test.push_back(tree->data[0]);
-
-
 		}
 		else {
+			//if (tree->left != nullptr && tree->right != nullptr && tree->middle != nullptr) {
+			//	ExampleApp::getTriangles(tree->left);
+			//	ExampleApp::getTriangles(tree->middle);
+			//	ExampleApp::getTriangles(tree->right);
+			//}
+
 			ExampleApp::getTriangles(tree->left);
-			if (tree->middle != nullptr) {
-				ExampleApp::getTriangles(tree->middle);
-			}
+			//if (tree->middle != nullptr) {
+			//	ExampleApp::getTriangles(tree->middle);
+			//}
 			ExampleApp::getTriangles(tree->right);
 		}
 	}
 
 
-	void ExampleApp::insertPoints(Node* tree)
-	{
-		if (tree->left == nullptr && tree->right == nullptr && tree->middle == nullptr)
-		{
-			std::vector<glm::vec2> temp;
+	//void ExampleApp::insertPoints(Node* tree)
+	//{
+	//	if (tree->left == nullptr && tree->right == nullptr && tree->middle == nullptr)
+	//	{
+	//		std::vector<glm::vec2> temp;
 
-			temp.push_back(tree->data[0]); // "left" point on hull
-			temp.push_back(tree->data[1]); // randompoint inside hull
-			temp.push_back(tree->data[2]); // "right" point on hull
+	//		temp.push_back(tree->data[0]); // "left" point on hull
+	//		temp.push_back(tree->data[1]); // randompoint inside hull
+	//		temp.push_back(tree->data[2]); // "right" point on hull
 
-			if (!pointsInsideHull.empty()) {
-				if (isPointInside(temp[0], temp[2], temp[1], pointsInsideHull[0])) {
-					std::cout << "point found " << std::endl;
+	//		if (!pointsInsideHull.empty()) {
+	//			if (isPointInside(temp[0], temp[2], temp[1], pointsInsideHull[0])) {
+	//				// std::cout << "point found " << std::endl;
 
-					auto selectedPoint = pointsInsideHull[0];
+	//				auto selectedPoint = pointsInsideHull[0];
 
-					pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[0]));
+	//				pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[0]));
 
-					auto left = newNode(tree, nullptr, nullptr, nullptr, temp[2], temp[1], selectedPoint);
-					auto middle = newNode(tree, nullptr, nullptr, nullptr, temp[2], temp[0], selectedPoint);
-					auto right = newNode(tree, nullptr, nullptr, nullptr, temp[0], temp[1], selectedPoint);
+	//				auto left = newNode(tree, nullptr, nullptr, nullptr, temp[2], temp[1], selectedPoint);
+	//				auto middle = newNode(tree, nullptr, nullptr, nullptr, temp[2], temp[0], selectedPoint);
+	//				auto right = newNode(tree, nullptr, nullptr, nullptr, temp[0], temp[1], selectedPoint);
 
-					tree->left = left;
-					tree->middle = middle;
-					tree->right = right;
+	//				tree->left = left;
+	//				tree->middle = middle;
+	//				tree->right = right;
 
-					}
-			}
-			
-		}
-		else {
-			ExampleApp::insertPoints(tree->left);
-			if (tree->middle != nullptr) {
-				ExampleApp::insertPoints(tree->middle);
-			}
-			ExampleApp::insertPoints(tree->right);
-		}
-	}
+	//			}
+	//		}
+	//		
+	//	}
+	//	else {
+
+	//		//if (tree->left != nullptr && tree->right != nullptr && tree->middle != nullptr) {
+	//		//	ExampleApp::insertPoints(tree->left);
+	//		//	ExampleApp::insertPoints(tree->middle);
+	//		//	ExampleApp::insertPoints(tree->right);
+	//		//}
+
+
+	//		ExampleApp::insertPoints(tree->left);
+	//		if (tree->middle != nullptr) {
+	//			ExampleApp::insertPoints(tree->middle);
+	//		}
+	//		ExampleApp::insertPoints(tree->right);
+
+	//	}
+	//}
 
 
 
@@ -326,7 +343,36 @@ namespace Example
 		return (A == A1 + A2 + A3);
 	}
 
+	void ExampleApp::sectorSearch(Node * tree, glm::vec2 point)
+	{
+		glm::vec2 c = tree->data[0];
+		glm::vec2 c_i = tree->data[1];
+		glm::vec2 c_m = tree->data[2];
+		glm::vec2 c_j = tree->data[3];
+		//std::cout << "c  " << c[0] << c[1] << std::endl;
+		//std::cout << "c_i  " << c_i[0] << c_i[1] << std::endl;
+		//std::cout << "c_m  " << c_m[0] << c_m[1] << std::endl;
+		//std::cout << "c_j  " << c_j[0] << c_j[1] << std::endl;
 
+
+		if (collinear(c, c_m, glm::vec2(0.277f, 0.277f)) >= 0) {
+			std::cout << "'left' of c->c_m " << std::endl;
+		}
+
+		if (collinear(c, c_m, glm::vec2(0.277f, -0.277f)) < 0) {
+			std::cout << "'right' of c->c_m " << std::endl;
+		}
+
+		if (collinear(c, c_i, glm::vec2(-0.277f, 0.277f)) >= 0) {
+			std::cout << "'left' of c->c_i " << std::endl;
+		}
+
+		if (collinear(c, c_i, glm::vec2(-0.277f, -0.277f)) < 0) {
+			std::cout << "'right' of c->c_i " << std::endl;
+		}
+
+
+	}
 
 	//------------------------------------------------------------------------------
 	/**
@@ -371,41 +417,22 @@ namespace Example
 
 
 					hull = this->ExampleApp::convexHull(vecArr);
-					hull.push_back(hull[0]); // need to add first point of hull again to wrap around
+					// add first point of hull again to wrap around
+					hull.push_back(hull[0]);
 					auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
-
-
-					// HARDCODED: FOR TESTING
-					//pointsInsideHull.clear();
-
-					//pointsInsideHull.push_back(glm::vec2(0.25f, -0.1f));
-					//pointsInsideHull.push_back(glm::vec2(0.25f, 0.1f));
-
-					//pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
-
-					//pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
-
-					//pointsInsideHull.push_back(glm::vec2(0.0f, 0.3f));
-
-
-					//pointsInsideHull.push_back(glm::vec2(0.277f, 0.277f));
-					//pointsInsideHull.push_back(glm::vec2(0.277f, -0.277f));
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, -0.277f));
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, 0.277f));
-
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, 0.0f));
-
 
 					this->sortVector(pointsInsideHull);
 
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
-					// TODO: handle case of splitting ternary nodes
-					while (!pointsInsideHull.empty()) {
-						std::cout << "asd " << std::endl;
+					//while (!pointsInsideHull.empty()) {
+					//	// std::cout << "asd " << std::endl;
 
-						this->ExampleApp::insertPoints(tree);
-					}
+					//	this->ExampleApp::insertPoints(tree);
+					//}
+
+					this->ExampleApp::sectorSearch(tree, glm::vec2(0.277f, 0.277f));
+
 
 					triangleMesh.clear();
 					this->ExampleApp::getTriangles(tree);
@@ -523,8 +550,8 @@ namespace Example
 			glBufferData(GL_ARRAY_BUFFER, triangleMesh.size() * sizeof(glm::vec2), triangleMesh.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_LINES, 0, this->triangleMesh.size());
 
-			// glBufferData(GL_ARRAY_BUFFER, test.size() * sizeof(glm::vec2), test.data(), GL_STATIC_DRAW);
-			// glDrawArrays(GL_TRIANGLES, 0, this->test.size());
+			glBufferData(GL_ARRAY_BUFFER, triangleMesh.size() * sizeof(glm::vec2), triangleMesh.data(), GL_STATIC_DRAW);
+			glDrawArrays(GL_TRIANGLES, 0, this->triangleMesh.size());
 
 			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec2), pointsInsideHull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->pointsInsideHull.size());

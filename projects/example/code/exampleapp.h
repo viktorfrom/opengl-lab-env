@@ -37,15 +37,28 @@ namespace Example
 			std::vector<glm::vec2> data;
 		};
 
-		Node* newNode(Node* parent, Node* left, Node* middle, Node* right, glm::vec2 &point1, glm::vec2 &point2, glm::vec2 c)
+		Node* leafNode(Node* parent, Node* left, Node* middle, Node* right, glm::vec2 c, glm::vec2 c_i, glm::vec2 c_j)
 		{
-			// Node* node = (Node*)malloc(sizeof(Node));
 			Node* node = new Node();
 
-			node->data.push_back(point1);
 			node->data.push_back(c);
-			node->data.push_back(point2);
-			// node->data.push_back(point1);
+			node->data.push_back(c_i);
+			node->data.push_back(c_j);
+
+			node->left = left;
+			node->middle = middle;
+			node->right = right;
+			return (node);
+		}
+
+		Node* binaryNode(Node* parent, Node* left, Node* middle, Node* right, glm::vec2 c, glm::vec2 c_i, glm::vec2 c_m, glm::vec2 c_j)
+		{
+			Node* node = new Node();
+
+			node->data.push_back(c);
+			node->data.push_back(c_i);
+			node->data.push_back(c_m);
+			node->data.push_back(c_j);
 
 			node->left = left;
 			node->middle = middle;
@@ -55,11 +68,9 @@ namespace Example
 
 		std::vector<glm::vec2> vecArr;
 		std::vector<glm::vec2> buf;
-
 		std::vector<glm::vec2> hull;
 		std::vector<glm::vec2> pointsInsideHull;
 		std::vector<glm::vec2> triangleMesh;
-
 
 		GLuint program;
 		GLuint vertexShader;
@@ -83,7 +94,9 @@ namespace Example
 		GLfloat ExampleApp::triangleArea(glm::vec2 left, glm::vec2 top, glm::vec2 right);
 		bool ExampleApp::isPointInside(glm::vec2 left, glm::vec2 top, glm::vec2 right, glm::vec2 point);
 
-		void ExampleApp::insertPoints(Node* tree);
+		void ExampleApp::sectorSearch(Node* tree, glm::vec2);
+
+		// void ExampleApp::insertPoints(Node* tree);
 
 	};
 } // namespace Example
