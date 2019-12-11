@@ -349,26 +349,48 @@ namespace Example
 		glm::vec2 c_i = tree->data[1];
 		glm::vec2 c_m = tree->data[2];
 		glm::vec2 c_j = tree->data[3];
-		//std::cout << "c  " << c[0] << c[1] << std::endl;
-		//std::cout << "c_i  " << c_i[0] << c_i[1] << std::endl;
-		//std::cout << "c_m  " << c_m[0] << c_m[1] << std::endl;
-		//std::cout << "c_j  " << c_j[0] << c_j[1] << std::endl;
+
+		// kolla först om c_i ligger till vänster om c_m->c eller till höger
+		// sen kolla om case 1 "q till höger om c_i->c OCH q till vänster om c_m->c"
+		// sen kolla om case 2 "q till höger om c_i->c ELLER q till vänster om c_m->c"
 
 
-		if (collinear(c, c_m, glm::vec2(0.277f, 0.277f)) >= 0) {
-			std::cout << "'left' of c->c_m " << std::endl;
+		//// sen kolla om case 1 "q till höger om c_i->c OCH q till vänster om c_m->c"
+		//if (collinear(c_m, c, c_i) >= 0) {
+		//	auto test = collinear(c_m, c, c_i);
+		//	std::cout << "'left' of c->c_m " << test << std::endl;
+		//}
+		//// sen kolla om case 2 "q till höger om c_i->c ELLER q till vänster om c_m->c"
+		//if (collinear(c_m, c, c_i) < 0) {
+		//	auto test = collinear(c_m, c, c_i);
+		//	std::cout << "'right' of c->c_m " << test << std::endl;
+		//}
+
+
+
+		if (collinear(c_m, c, point) < 0) {
+			auto test = collinear(c_i, c, c_i);
+			std::cout << "'right' of c->c_m " << test << std::endl;
+
 		}
 
-		if (collinear(c, c_m, glm::vec2(0.277f, -0.277f)) < 0) {
-			std::cout << "'right' of c->c_m " << std::endl;
+		if (collinear(c_m, c, point) >= 0) {
+			auto test = collinear(c_i, c, c_i);
+			std::cout << "'left' of c->c_m " << test << std::endl;
+
 		}
 
-		if (collinear(c, c_i, glm::vec2(-0.277f, 0.277f)) >= 0) {
-			std::cout << "'left' of c->c_i " << std::endl;
+
+		if (collinear(c_i, c, point) >= 0) {
+			auto test = collinear(c_i, c, c_i);
+
+			std::cout << "'left' of c->c_i " << test << std::endl;
 		}
 
-		if (collinear(c, c_i, glm::vec2(-0.277f, -0.277f)) < 0) {
-			std::cout << "'right' of c->c_i " << std::endl;
+		if (collinear(c_i, c, point) < 0) {
+			auto test = collinear(c_i, c, c_i);
+
+			std::cout << "'right' of c->c_i " << test << std::endl;
 		}
 
 
@@ -432,7 +454,12 @@ namespace Example
 					//}
 
 					this->ExampleApp::sectorSearch(tree, glm::vec2(0.277f, 0.277f));
+					// this->ExampleApp::sectorSearch(tree, glm::vec2(0.277f, -0.277f));
+					// this->ExampleApp::sectorSearch(tree, glm::vec2(-0.277f, 0.277f));
+					// this->ExampleApp::sectorSearch(tree, glm::vec2(-0.277f, -0.277f));
 
+
+					
 
 					triangleMesh.clear();
 					this->ExampleApp::getTriangles(tree);
