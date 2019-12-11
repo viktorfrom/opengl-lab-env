@@ -350,47 +350,19 @@ namespace Example
 		glm::vec2 c_m = tree->data[2];
 		glm::vec2 c_j = tree->data[3];
 
-		// kolla först om c_i ligger till vänster om c_m->c eller till höger
-		// sen kolla om case 1 "q till höger om c_i->c OCH q till vänster om c_m->c"
-		// sen kolla om case 2 "q till höger om c_i->c ELLER q till vänster om c_m->c"
-
-
-		//// sen kolla om case 1 "q till höger om c_i->c OCH q till vänster om c_m->c"
-		//if (collinear(c_m, c, c_i) >= 0) {
-		//	auto test = collinear(c_m, c, c_i);
-		//	std::cout << "'left' of c->c_m " << test << std::endl;
-		//}
-		//// sen kolla om case 2 "q till höger om c_i->c ELLER q till vänster om c_m->c"
-		//if (collinear(c_m, c, c_i) < 0) {
-		//	auto test = collinear(c_m, c, c_i);
-		//	std::cout << "'right' of c->c_m " << test << std::endl;
-		//}
-
-
-
-		if (collinear(c_m, c, point) < 0) {
-			auto test = collinear(c_i, c, c_i);
-			std::cout << "'right' of c->c_m " << test << std::endl;
-
+		// case 1
+		if (collinear(c_m, c, c_i) >= 0) {
+			if (collinear(c_i, c, point) < 0 && collinear(c_m, c, point) >= 0) {
+				std::cout << "q is 'right' of c_i->c AND q is 'left' of c_m->c" << std::endl;
+			}
 		}
+		// case 2
+		if (collinear(c_m, c, c_i) < 0) {
 
-		if (collinear(c_m, c, point) >= 0) {
-			auto test = collinear(c_i, c, c_i);
-			std::cout << "'left' of c->c_m " << test << std::endl;
+			if (collinear(c_i, c, point) < 0 || collinear(c_m, c, point) >= 0) {
+				std::cout << "q is 'right' of c_i->c OR q is 'left' of c_m->c" << std::endl;
 
-		}
-
-
-		if (collinear(c_i, c, point) >= 0) {
-			auto test = collinear(c_i, c, c_i);
-
-			std::cout << "'left' of c->c_i " << test << std::endl;
-		}
-
-		if (collinear(c_i, c, point) < 0) {
-			auto test = collinear(c_i, c, c_i);
-
-			std::cout << "'right' of c->c_i " << test << std::endl;
+			}
 		}
 
 
