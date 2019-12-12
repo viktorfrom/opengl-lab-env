@@ -45,6 +45,7 @@ namespace Example
 			node->data.push_back(c_i);
 			node->data.push_back(c_j);
 
+			node->parent = parent;
 			node->left = left;
 			node->middle = middle;
 			node->right = right;
@@ -60,6 +61,7 @@ namespace Example
 			node->data.push_back(c_m);
 			node->data.push_back(c_j);
 
+			node->parent = parent;
 			node->left = left;
 			node->middle = middle;
 			node->right = right;
@@ -90,13 +92,11 @@ namespace Example
 		Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c);
 		void ExampleApp::getTriangles(Node* tree);
 
-		// point location inside triangle
-		GLfloat ExampleApp::triangleArea(glm::vec2 left, glm::vec2 top, glm::vec2 right);
-		bool ExampleApp::isPointInside(glm::vec2 left, glm::vec2 top, glm::vec2 right, glm::vec2 point);
+		void ExampleApp::pointLocation(Node* tree, glm::vec2 point);
 
-		void ExampleApp::sectorSearch(Node* tree, glm::vec2);
+		void ExampleApp::insertPoints(Node* tree, glm::vec2 point);
 
-		// void ExampleApp::insertPoints(Node* tree);
+		void ExampleApp::pointOnLine(Node* tree, glm::vec2 point);
 
 	};
 } // namespace Example

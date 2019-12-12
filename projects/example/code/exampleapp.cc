@@ -255,12 +255,6 @@ namespace Example
 			//triangleMesh.push_back(tree->data[2]);
 		}
 		else {
-			//if (tree->left != nullptr && tree->right != nullptr && tree->middle != nullptr) {
-			//	ExampleApp::getTriangles(tree->left);
-			//	ExampleApp::getTriangles(tree->middle);
-			//	ExampleApp::getTriangles(tree->right);
-			//}
-
 			ExampleApp::getTriangles(tree->left);
 			if (tree->middle != nullptr) {
 				ExampleApp::getTriangles(tree->middle);
@@ -275,8 +269,8 @@ namespace Example
 		{
 			std::vector<glm::vec2> temp;
 
-			temp.push_back(tree->data[0]); // "left" point on hull
-			temp.push_back(tree->data[1]); // randompoint inside hull
+			temp.push_back(tree->data[0]); // randompoint inside hull
+			temp.push_back(tree->data[1]); // "left" point on hull
 			temp.push_back(tree->data[2]); // "right" point on hull
 
 
@@ -330,6 +324,23 @@ namespace Example
 
 				ExampleApp::insertPoints(tree->right, point);
 			}
+		} else if (collinear(c, c_m, point) == 0 || collinear(c_m, c_i, point) == 0 || collinear(c_i, c, point) == 0) {
+			// std::cout << "point is on a line!" << std::endl;
+
+			if (collinear(c, c_m, point) == 0 && tree->left != nullptr) {
+				std::cout << "point is on left line!" << std::endl;
+				ExampleApp::pointOnLine(tree, point);
+			}
+
+			if (collinear(c_m, c_i, point) == 0 && tree->middle != nullptr) {
+				std::cout << "point is on middle line!" << std::endl;
+				ExampleApp::pointOnLine(tree, point);
+			}
+
+			if (collinear(c_i, c, point) == 0 && tree->right != nullptr) {
+				std::cout << "point is on right line!" << std::endl;
+				ExampleApp::pointOnLine(tree, point);
+			}
 		}
 		else {
 			if (collinear(c_m, c, c_i) >= 0) { // case 1
@@ -352,14 +363,31 @@ namespace Example
 					// std::cout << "right" << std::endl;
 				}
 			}
-
-
-	
-
-
 		}
+	}
+
+	void ExampleApp::pointOnLine(Node* tree, glm::vec2 point) {
+			//auto newLeftNode = binaryNode(tree->parent, nullptr, nullptr, nullptr, tree->parent->data[0], tree->parent->data[1], tree->parent->data[2], tree->parent->data[3]);
+
+			//auto left123 = leafNode(newLeftNode, nullptr, nullptr, nullptr, point, tree->data[1], tree->data[0]);
+			//auto right123 = leafNode(newLeftNode, nullptr, nullptr, nullptr, point, tree->data[1], tree->data[2]);
+
+
+			//newLeftNode->left = left123;
+			//newLeftNode->right = right123;
+
+
+			//auto newRightNode = binaryNode(tree->parent, nullptr, nullptr, nullptr, tree->parent->data[0], tree->parent->data[1], tree->parent->data[2], tree->parent->data[3]);
+
+			//auto left456 = leafNode(newRightNode, nullptr, nullptr, nullptr, point, tree->data[2], tree->data[1]);
+			//auto right456 = leafNode(newRightNode, nullptr, nullptr, nullptr, point, tree->data[2], tree->data[0]);
+
+
+			//newRightNode->left = left456;
+			//newRightNode->right = right456;
 
 	}
+
 
 
 	//------------------------------------------------------------------------------
@@ -419,61 +447,18 @@ namespace Example
 					//pointsInsideHull.push_back(glm::vec2(0.277f, -0.277f));
 					//pointsInsideHull.push_back(glm::vec2(-0.277f, -0.277f));
 					//pointsInsideHull.push_back(glm::vec2(-0.277f, 0.0f));
-					pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
+					//pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
 
-					pointsInsideHull.push_back(glm::vec2(0.3f, 0.1f));
-					pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
+					//pointsInsideHull.push_back(glm::vec2(0.3f, 0.1f));
+					//pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
+					//pointsInsideHull.push_back(glm::vec2(0.377f, -0.05f));
+					//pointsInsideHull.push_back(glm::vec2(0.5f, -0.1f));
+					//pointsInsideHull.push_back(glm::vec2(0.45f, 0.15f));
+					//pointsInsideHull.push_back(glm::vec2(0.55f, 0.0f));
+					//pointsInsideHull.push_back(glm::vec2(0.25f, -0.05f));
 
-					pointsInsideHull.push_back(glm::vec2(0.377f, -0.05f));
-					pointsInsideHull.push_back(glm::vec2(0.5f, -0.1f));
-
-					pointsInsideHull.push_back(glm::vec2(0.45f, 0.15f));
-
-					pointsInsideHull.push_back(glm::vec2(0.55f, 0.0f));
-
-
-
-					pointsInsideHull.push_back(glm::vec2(0.25f, -0.05f));
-
-
-					//glm::vec2 c = glm::vec2(0.0f, 0.0f);
-					//glm::vec2 c_i = glm::vec2(0.577f, 0.333f);
-					//glm::vec2 c_m = glm::vec2(-0.577f, -0.333f);
-					//glm::vec2 c_j = glm::vec2(0.577f, 0.333f);
-
-					//glm::vec2 point = glm::vec2(0.277f, 0.277f);
-
-
-
-					//if (collinear(c_j, c, point) >= 0) {
-					//	auto test = collinear(c_j, c, point);
-					//	std::cout << "left of c_j " << test << std::endl;
-					//}
-
-					//if (collinear(c_j, c, point) < 0) {
-					//	auto test = collinear(c_i, c, point);
-					//	std::cout << "right of c_j " << test << std::endl;
-					//}
-
-					//if (collinear(c_i, c, point) >= 0) {
-					//	auto test = collinear(c_i, c, point);
-					//	std::cout << "left of c_i " << test << std::endl;
-					//}
-
-					//if (collinear(c_i, c, point) < 0) {
-					//	auto test = collinear(c_i, c, point);
-					//	std::cout << "right of c_i " << test << std::endl;
-					//}
-					//	
-					//if (collinear(c_m, c, point) >= 0) {
-					//	auto test = collinear(c_m, c, point);
-					//	std::cout << "left of c_m " << test << std::endl;
-					//}
-
-					//if (collinear(c_m, c, point) < 0) {
-					//	auto test = collinear(c_m, c, point);
-					//	std::cout << "right of c_m " << test << std::endl;
-					//}
+					pointsInsideHull.push_back(glm::vec2(0.577/2.0f, 0.333/2.0f));
+					buf.push_back(glm::vec2(0.577 / 2.0f, 0.333 / 2.0f));
 
 
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
@@ -507,6 +492,19 @@ namespace Example
 
 
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+
+					while (!pointsInsideHull.empty()) {
+						auto selectedPoint = pointsInsideHull[0];
+						this->ExampleApp::insertPoints(tree, selectedPoint);
+						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[0]));
+					}
+
+					// remove point from pointsInsideHull
+
+					if (pointsInsideHull.empty()) {
+						std::cout << "empty" << std::endl;
+					}
 
 
 					triangleMesh.clear();
