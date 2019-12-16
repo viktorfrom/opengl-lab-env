@@ -98,5 +98,6 @@ namespace Example
 
 		void ExampleApp::pointOnLine(Node* tree, glm::vec2 point);
 
+		bool ExampleApp::onSegment(glm::vec2 start, glm::vec2 point, glm::vec2 end);
 	};
 } // namespace Example

@@ -177,7 +177,7 @@ namespace Example
 	}
 
 
-	void ExampleApp::sortVector(std::vector<glm::vec2> &inputVector)
+	void ExampleApp::sortVector(std::vector<glm::vec2>& inputVector)
 	{
 		std::sort(inputVector.begin(), inputVector.end(),
 			[](const glm::vec2& v1, const glm::vec2& v2) {
@@ -189,7 +189,7 @@ namespace Example
 				}});
 	}
 
-	glm::vec2 ExampleApp::calcPointsInsideHull(std::vector<glm::vec2> &vecArr, std::vector<glm::vec2> &hull)
+	glm::vec2 ExampleApp::calcPointsInsideHull(std::vector<glm::vec2>& vecArr, std::vector<glm::vec2>& hull)
 	{
 		pointsInsideHull.clear();
 		for (int i = 0; i < vecArr.size(); i++) {
@@ -213,11 +213,11 @@ namespace Example
 		}
 	}
 
-	ExampleApp::Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2> &hull, glm::vec2 c)
+	ExampleApp::Node* ExampleApp::buildTree(Node* parent, std::vector<glm::vec2>& hull, glm::vec2 c)
 	{
 		if (hull.size() == 2) {
 			return leafNode(parent, nullptr, nullptr, nullptr, c, hull[0], hull[1]);
-			
+
 		}
 		else {
 			auto c_i = hull[0];
@@ -265,8 +265,7 @@ namespace Example
 
 	void ExampleApp::insertPoints(Node* tree, glm::vec2 point)
 	{
-		if (tree->left == nullptr && tree->right == nullptr && tree->middle == nullptr)
-		{
+		if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
 			std::vector<glm::vec2> temp;
 
 			temp.push_back(tree->data[0]); // randompoint inside hull
@@ -282,112 +281,113 @@ namespace Example
 				tree->left = left;
 				tree->middle = middle;
 				tree->right = right;
+
 			}
-			
 		}
 		else {
-			this->ExampleApp::pointLocation(tree, point);
+			ExampleApp::pointLocation(tree, point);
 		}
 	}
 
-	void ExampleApp::pointLocation(Node * tree, glm::vec2 point)
+	void ExampleApp::pointLocation(Node* tree, glm::vec2 point)
 	{
 		glm::vec2 c = tree->data[0];
 		glm::vec2 c_i = tree->data[1];
 		glm::vec2 c_m = tree->data[2];
 
 
-		if (tree->middle != nullptr) {
-			std::cout << "treneary node found!" << std::endl;
 
+		if (tree->left != nullptr && tree->middle != nullptr && tree->right != nullptr) {
 
-			glm::vec2 c = tree->left->data[0]; // p
+			// std::cout << "treneary node found!" << std::endl;
+
+			glm::vec2 c = tree->left->data[0]; // p, same value with tree->middle, tree->right
 			glm::vec2 c_i = tree->data[0];
 			glm::vec2 c_j = tree->data[1];
 			glm::vec2 c_m = tree->data[2];
-			
+
 			if (collinear(c_i, c, point) < 0 && collinear(c_j, c, point) >= 0) {
 				// std::cout << "left" << std::endl;
-
 				ExampleApp::insertPoints(tree->left, point);
 			}
-			 
-			
-			else if (collinear(c_j, c, point) < 0 && collinear(c_m, c, point) >= 0) {
-				// std::cout << "middle" << std::endl;
 
+
+			if (collinear(c_j, c, point) < 0 && collinear(c_m, c, point) >= 0) {
+				// std::cout << "middle" << std::endl;
 				ExampleApp::insertPoints(tree->middle, point);
 			}
-			
-			else if (collinear(c_m, c, point) < 0 && collinear(c_i, c, point) >= 0) {
-				// std::cout << "right" << std::endl;
 
+			if (collinear(c_m, c, point) < 0 && collinear(c_i, c, point) >= 0) {
+				// std::cout << "right" << std::endl;
 				ExampleApp::insertPoints(tree->right, point);
 			}
-		} else if (collinear(c, c_m, point) == 0 || collinear(c_m, c_i, point) == 0 || collinear(c_i, c, point) == 0) {
-			// std::cout << "point is on a line!" << std::endl;
+		}
+		//else if (tree->left != nullptr && tree->middle == nullptr && tree->right != nullptr) {
+		//	glm::vec2 c = tree->data[0];
+		//	glm::vec2 c_i = tree->data[1];
+		//	glm::vec2 c_m = tree->data[2];
 
-			if (collinear(c, c_m, point) == 0 && tree->left != nullptr) {
-				std::cout << "point is on left line!" << std::endl;
-				ExampleApp::pointOnLine(tree, point);
-			}
+		//	// kommentera ut "=" i else satsen för att få bort strecken
+		//	if (onSegment(c, point, c_i)) {
+		//		std::cout << "point on left line" << std::endl;
+		//		ExampleApp::pointOnLine(tree, point);
+		//	}
 
-			if (collinear(c_m, c_i, point) == 0 && tree->middle != nullptr) {
-				std::cout << "point is on middle line!" << std::endl;
-				ExampleApp::pointOnLine(tree, point);
-			}
+		//	if (onSegment(c_m, point, c_i)) {
+		//		std::cout << "point on middle line" << std::endl;
+		//		ExampleApp::pointOnLine(tree, point);
+		//	}
 
-			if (collinear(c_i, c, point) == 0 && tree->right != nullptr) {
-				std::cout << "point is on right line!" << std::endl;
-				ExampleApp::pointOnLine(tree, point);
-			}
+		//	if (onSegment(c, point, c_m)) {
+		//		std::cout << "point on right line" << std::endl;
+		//		ExampleApp::pointOnLine(tree, point);
+		//	}
+
+		//}
+		else if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
+			ExampleApp::insertPoints(tree, point);
+
 		}
 		else {
 			if (collinear(c_m, c, c_i) >= 0) { // case 1
 				if (collinear(c_i, c, point) < 0 && collinear(c_m, c, point) >= 0) {
-					ExampleApp::insertPoints(tree->left, point);
+					ExampleApp::pointLocation(tree->left, point);
 					// std::cout << "left" << std::endl;
 				}
 				else {
-					ExampleApp::insertPoints(tree->right, point);
+					ExampleApp::pointLocation(tree->right, point);
 					// std::cout << "right" << std::endl;
 				}
 			}
 			else if (collinear(c_m, c, c_i) < 0) { // case 2
 				if (collinear(c_i, c, point) < 0 || collinear(c_m, c, point) >= 0) {
-					ExampleApp::insertPoints(tree->left, point);
+					ExampleApp::pointLocation(tree->left, point);
 					// std::cout << "left" << std::endl;
 				}
 				else {
-					ExampleApp::insertPoints(tree->right, point);
+					ExampleApp::pointLocation(tree->right, point);
 					// std::cout << "right" << std::endl;
 				}
 			}
 		}
 	}
 
-	void ExampleApp::pointOnLine(Node* tree, glm::vec2 point) {
-			//auto newLeftNode = binaryNode(tree->parent, nullptr, nullptr, nullptr, tree->parent->data[0], tree->parent->data[1], tree->parent->data[2], tree->parent->data[3]);
+	bool ExampleApp::onSegment(glm::vec2 start, glm::vec2 point, glm::vec2 end) {
 
-			//auto left123 = leafNode(newLeftNode, nullptr, nullptr, nullptr, point, tree->data[1], tree->data[0]);
-			//auto right123 = leafNode(newLeftNode, nullptr, nullptr, nullptr, point, tree->data[1], tree->data[2]);
-
-
-			//newLeftNode->left = left123;
-			//newLeftNode->right = right123;
-
-
-			//auto newRightNode = binaryNode(tree->parent, nullptr, nullptr, nullptr, tree->parent->data[0], tree->parent->data[1], tree->parent->data[2], tree->parent->data[3]);
-
-			//auto left456 = leafNode(newRightNode, nullptr, nullptr, nullptr, point, tree->data[2], tree->data[1]);
-			//auto right456 = leafNode(newRightNode, nullptr, nullptr, nullptr, point, tree->data[2], tree->data[0]);
-
-
-			//newRightNode->left = left456;
-			//newRightNode->right = right456;
-
+		if (point.x <= std::max(start.x, end.x) && point.x >= std::min(start.x, end.x) &&
+			point.y <= std::max(start.y, end.y) && point.y >= std::min(start.y, end.y)) {
+			return true;
+		}
+		return false;
 	}
 
+	void ExampleApp::pointOnLine(Node* tree, glm::vec2 point) {
+
+		if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
+			std::cout << "test" << std::endl;
+
+		}
+	}
 
 
 	//------------------------------------------------------------------------------
@@ -410,27 +410,52 @@ namespace Example
 					buf = vecArr;
 
 					hull = this->ExampleApp::convexHull(vecArr);
+					// add first point of hull again to wrap around
 					hull.push_back(hull[0]);
 					auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
+					this->sortVector(pointsInsideHull);
+
+
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
+
+
+					while (!pointsInsideHull.empty()) {
+						auto selectedPoint = pointsInsideHull[0];
+						this->ExampleApp::pointLocation(tree, selectedPoint);
+						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), selectedPoint));
+					}
+
+					// remove point from pointsInsideHull
+
+
+					if (pointsInsideHull.empty()) {
+						//std::cout << "empty" << std::endl;
+					}
 
 					triangleMesh.clear();
 					this->ExampleApp::getTriangles(tree);
 
+
 				}
 				else if (key == 50 && action == GLFW_PRESS) {
+
 					vecArr.clear();
 					buf.clear();
 					hull.clear();
 					pointsInsideHull.clear();
 					triangleMesh.clear();
 
+					vecArr.push_back(glm::vec2(0.0f, 0.6f));
+					vecArr.push_back(glm::vec2(0.0f, -0.6f));
+					vecArr.push_back(glm::vec2(0.577f, 0.333f));
+					vecArr.push_back(glm::vec2(0.577f, -0.333f));
+					vecArr.push_back(glm::vec2(-0.577f, 0.333f));
+					vecArr.push_back(glm::vec2(-0.577f, -0.333f));
 
-					this->readFromFile("testFan.txt");
+
 
 					buf = vecArr;
-
 
 					hull = this->ExampleApp::convexHull(vecArr);
 					// add first point of hull again to wrap around
@@ -442,23 +467,28 @@ namespace Example
 					// HARD CODED FOR TESTING
 					pointsInsideHull.clear();
 
-					// pointsInsideHull.push_back(glm::vec2(0.277f, 0.277f));
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, 0.277f));
-					//pointsInsideHull.push_back(glm::vec2(0.277f, -0.277f));
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, -0.277f));
-					//pointsInsideHull.push_back(glm::vec2(-0.277f, 0.0f));
-					//pointsInsideHull.push_back(glm::vec2(0.277f, 0.0f));
+					//glm::vec2 test = glm::vec2(0.577 / 2.0f, 0.333 / 2.0f);
+					//glm::vec2 test2 = glm::vec2(0.200f, 0.277f);
+					//glm::vec2 test3 = glm::vec2(0.177f, 0.4f);
+					//glm::vec2 test4 = glm::vec2(0.15f, 0.25f);
+					//glm::vec2 test5 = glm::vec2(0.05f, 0.3f);
 
-					//pointsInsideHull.push_back(glm::vec2(0.3f, 0.1f));
-					//pointsInsideHull.push_back(glm::vec2(0.477f, 0.1f));
-					//pointsInsideHull.push_back(glm::vec2(0.377f, -0.05f));
-					//pointsInsideHull.push_back(glm::vec2(0.5f, -0.1f));
-					//pointsInsideHull.push_back(glm::vec2(0.45f, 0.15f));
-					//pointsInsideHull.push_back(glm::vec2(0.55f, 0.0f));
-					//pointsInsideHull.push_back(glm::vec2(0.25f, -0.05f));
 
-					pointsInsideHull.push_back(glm::vec2(0.577/2.0f, 0.333/2.0f));
-					buf.push_back(glm::vec2(0.577 / 2.0f, 0.333 / 2.0f));
+					//pointsInsideHull.push_back(test);
+					//pointsInsideHull.push_back(test2);
+					//pointsInsideHull.push_back(test3);
+					//pointsInsideHull.push_back(test4);
+					//pointsInsideHull.push_back(test5);
+
+
+					//buf.push_back(test);
+					//buf.push_back(test2);
+					//buf.push_back(test3);
+					//buf.push_back(test4);
+					//buf.push_back(test5);
+
+
+					buf.push_back(glm::vec2(0.0f, 0.0f));
 
 
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
@@ -466,17 +496,20 @@ namespace Example
 
 					while (!pointsInsideHull.empty()) {
 						auto selectedPoint = pointsInsideHull[0];
-						this->ExampleApp::insertPoints(tree, selectedPoint);
-						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[0]));
+						this->ExampleApp::pointLocation(tree, selectedPoint);
+						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), selectedPoint));
 					}
 
 					// remove point from pointsInsideHull
 
 
-
+					if (pointsInsideHull.empty()) {
+						//std::cout << "empty" << std::endl;
+					}
 
 					triangleMesh.clear();
 					this->ExampleApp::getTriangles(tree);
+
 				}
 
 				else if (key == 49 && action == GLFW_PRESS) {
@@ -494,18 +527,19 @@ namespace Example
 					auto tree = this->ExampleApp::buildTree(nullptr, hull, randomPoint);
 
 
+
 					while (!pointsInsideHull.empty()) {
 						auto selectedPoint = pointsInsideHull[0];
-						this->ExampleApp::insertPoints(tree, selectedPoint);
-						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), pointsInsideHull[0]));
+						this->ExampleApp::pointLocation(tree, selectedPoint);
+						pointsInsideHull.erase(std::find(pointsInsideHull.begin(), pointsInsideHull.end(), selectedPoint));
 					}
 
 					// remove point from pointsInsideHull
 
-					if (pointsInsideHull.empty()) {
-						std::cout << "empty" << std::endl;
-					}
 
+					if (pointsInsideHull.empty()) {
+						//std::cout << "empty" << std::endl;
+					}
 
 					triangleMesh.clear();
 					this->ExampleApp::getTriangles(tree);
@@ -600,6 +634,8 @@ namespace Example
 			glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, NULL);
 			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, (GLvoid*)(sizeof(float32) * 2));
 
+			glLineWidth(3.0f);
+			glPointSize(10.0f);
 
 			glBufferData(GL_ARRAY_BUFFER, triangleMesh.size() * sizeof(glm::vec2), triangleMesh.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_LINES, 0, this->triangleMesh.size());
