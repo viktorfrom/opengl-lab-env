@@ -5,6 +5,7 @@
 #include "config.h"
 #include "exampleapp.h"
 
+
 int
 main(int argc, const char** argv)
 {
@@ -15,5 +16,5 @@ main(int argc, const char** argv)
 		app.Close();
 	}
 	app.Exit();
-	
+
 }
