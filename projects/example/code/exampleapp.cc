@@ -21,6 +21,9 @@
 #include "glm/gtx/string_cast.hpp"
 #include <algorithm>
 #include <vector>
+
+#include "imgui.h"
+#define STRING_BUFFER_SIZE 8192
 // using namespace std;
 
 const GLchar* vs =
@@ -77,7 +80,7 @@ namespace Example
 		}
 		else {
 			printf("File not found!");
-			exit(1);
+			//exit(1);
 		}
 
 		inputFile.close();
@@ -240,19 +243,19 @@ namespace Example
 		if (tree->left == nullptr && tree->right == nullptr && tree->middle == nullptr)
 		{
 
-			triangleMesh.push_back(tree->data[1]);
-			triangleMesh.push_back(tree->data[0]);
+			triangleLines.push_back(tree->data[1]);
+			triangleLines.push_back(tree->data[0]);
 
-			triangleMesh.push_back(tree->data[1]);
-			triangleMesh.push_back(tree->data[2]);
+			triangleLines.push_back(tree->data[1]);
+			triangleLines.push_back(tree->data[2]);
 
-			triangleMesh.push_back(tree->data[0]);
-			triangleMesh.push_back(tree->data[2]);
+			triangleLines.push_back(tree->data[0]);
+			triangleLines.push_back(tree->data[2]);
 
 			// for triangles 
-			//triangleMesh.push_back(tree->data[0]);
-			//triangleMesh.push_back(tree->data[1]);
-			//triangleMesh.push_back(tree->data[2]);
+			triangleMesh.push_back(tree->data[0]);
+			triangleMesh.push_back(tree->data[1]);
+			triangleMesh.push_back(tree->data[2]);
 		}
 		else {
 			ExampleApp::getTriangles(tree->left);
@@ -321,38 +324,40 @@ namespace Example
 				ExampleApp::insertPoints(tree->right, point);
 			}
 		}
-		//else if (onSegment(c_m, point, c)) {
-		//	std::cout << "point on line, c_m -> c" << std::endl;
-		//	if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
-		//		ExampleApp::insertPointsOnLine(tree, point);
-		//	}
-		//	else {
-		//		//ExampleApp::pointLocation(tree->right, point);
-		//		ExampleApp::pointLocation(tree->left, point);
 
-		//	}
-
-		//}
-		//else if (onSegment(c_i, point, c)) {
-		//	std::cout << "point on line, c_i -> c" << std::endl;
-		//	if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
-		//		ExampleApp::insertPointsOnLine(tree, point);
-
-		//	}
-		//	else {
-		//		ExampleApp::pointLocation(tree->right, point);
-		//		//ExampleApp::pointLocation(tree->left, point);
-
-		//	}
-
-		//}
+		else if (onSegment(c, point, c_i)) {
+			if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
+				ExampleApp::insertPointsOnLine(tree, point);
+			}
+			else {
+				ExampleApp::pointLocation(tree->left, point);
+			}
+		
+		}
+		else if (onSegment(c_i, point, c_m)) {
+			if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
+				ExampleApp::insertPointsOnLine(tree, point);
+			}
+			else {
+				ExampleApp::pointLocation(tree->right, point);
+				ExampleApp::pointLocation(tree->left, point);
+			}
+		}
+		else if (onSegment(c_m, point, c)) {
+			if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
+				ExampleApp::insertPointsOnLine(tree, point);
+			}
+			else {
+				ExampleApp::pointLocation(tree->right, point);
+			}
+		}
 		else if (tree->left == nullptr && tree->middle == nullptr && tree->right == nullptr) {
 			ExampleApp::insertPoints(tree, point);
 
 		}
 		else {
 			if (collinear(c_m, c, c_i) >= 0) { // case 1
-				if (collinear(c_i, c, point) < 0 && collinear(c_m, c, point) >= 0) {
+				if (collinear(c_i, c, point) < 0 && collinear(c_m, c, point) > 0) {
 					ExampleApp::pointLocation(tree->left, point);
 					// std::cout << "left" << std::endl;
 				}
@@ -362,7 +367,7 @@ namespace Example
 				}
 			}
 			else if (collinear(c_m, c, c_i) < 0) { // case 2
-				if (collinear(c_i, c, point) < 0 || collinear(c_m, c, point) >= 0) {
+				if (collinear(c_i, c, point) < 0 || collinear(c_m, c, point) > 0) {
 					ExampleApp::pointLocation(tree->left, point);
 					// std::cout << "left" << std::endl;
 				}
@@ -374,13 +379,18 @@ namespace Example
 		}
 	}
 
-	bool ExampleApp::onSegment(glm::vec2 start, glm::vec2 point, glm::vec2 end) {
-
-		if (point.x <= std::max(start.x, end.x) && point.x >= std::min(start.x, end.x) &&
-			point.y <= std::max(start.y, end.y) && point.y >= std::min(start.y, end.y)) {
+	bool ExampleApp::onSegment(glm::vec2 a, glm::vec2 point, glm::vec2 b)
+	{
+		if (((b.x - a.x)*(point.y - a.y) == (b.y - a.y)*(point.x - a.x)) &&
+			(glm::normalize(b - a) == glm::normalize(point - a))) {
+			std::cout << "asd" << std::endl;
 			return true;
 		}
-		return false;
+		else {
+			return false;
+
+		}
+
 	}
 
 	void ExampleApp::insertPointsOnLine(Node* tree, glm::vec2 point) 
@@ -473,19 +483,10 @@ namespace Example
 					hull.clear();
 					pointsInsideHull.clear();
 					triangleMesh.clear();
+					triangleLines.clear();
 
-					vecArr.push_back(glm::vec2(0.0f, 0.6f));
-					vecArr.push_back(glm::vec2(0.0f, -0.6f));
-					vecArr.push_back(glm::vec2(0.577f, 0.333f));
-					vecArr.push_back(glm::vec2(0.577f, -0.333f));
-					vecArr.push_back(glm::vec2(-0.577f, 0.333f));
-					vecArr.push_back(glm::vec2(-0.577f, -0.333f));
 
-					//vecArr.push_back(glm::vec2(0.5f, 0.5f));
-					//vecArr.push_back(glm::vec2(0.5f, -0.5f));
-					//vecArr.push_back(glm::vec2(-0.5f, 0.5f));
-					//vecArr.push_back(glm::vec2(-0.5f, -0.5f));
-
+					this->ExampleApp::readFromFile("testFan.txt");
 
 					buf = vecArr;
 
@@ -494,45 +495,21 @@ namespace Example
 					hull.push_back(hull[0]);
 					auto randomPoint = this->calcPointsInsideHull(vecArr, hull);
 
+
+
 					this->sortVector(pointsInsideHull);
 
-					// HARD CODED FOR TESTING
 					pointsInsideHull.clear();
 
-					
-					glm::vec2 test = glm::vec2(0.5 / 2.0f, 0.5 / 2.0f);
-					//glm::vec2 test1 = glm::vec2(0.0f, 0.0f);
-					//glm::vec2 test2 = glm::vec2(0.577f, 0.333f);
+					glm::vec2 asd1 = glm::vec2(0.577/2.0f, 0.333/2.0f);
+					pointsInsideHull.push_back(asd1);
+					buf.push_back(asd1);
+
+					glm::vec2 centerPoint = glm::vec2(0.0f, 0.0f);
+					buf.push_back(centerPoint);
 
 
-					//glm::vec2 test2 = glm::vec2(0.200f, 0.277f);
-					//glm::vec2 test3 = glm::vec2(0.177f, 0.4f);
-					//glm::vec2 test4 = glm::vec2(0.15f, 0.25f);
-					//glm::vec2 test5 = glm::vec2(0.05f, 0.3f);
-
-
-					pointsInsideHull.push_back(test);
-					//pointsInsideHull.push_back(test2);
-					//pointsInsideHull.push_back(test3);
-					//pointsInsideHull.push_back(test4);
-					//pointsInsideHull.push_back(test5);
-
-
-					buf.push_back(test);
-					//buf.push_back(test2);
-					//buf.push_back(test3);
-					//buf.push_back(test4);
-					//buf.push_back(test5);
-
-					//if (onSegment(test1,test, test2)) {
-					//	std::cout << "test123" << std::endl;
-					//}
-
-
-					buf.push_back(glm::vec2(0.0f, 0.0f));
-
-
-					auto tree = this->ExampleApp::buildTree(nullptr, hull, glm::vec2(0.0f, 0.0f));
+					auto tree = this->ExampleApp::buildTree(nullptr, hull, centerPoint);
 
 
 					while (!pointsInsideHull.empty()) {
@@ -648,10 +625,30 @@ namespace Example
 			glBindBuffer(GL_ARRAY_BUFFER, this->mesh);
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
 			glPointSize(5);
+
+
+			// create buffer for shader strings
+			this->vsBuffer = new GLchar[STRING_BUFFER_SIZE];
+			this->fsBuffer = new GLchar[STRING_BUFFER_SIZE];
+
+			// copy the hardcoded shader into buffer
+			strncpy_s(this->vsBuffer, STRING_BUFFER_SIZE, vs, STRING_BUFFER_SIZE);
+			strncpy_s(this->fsBuffer, STRING_BUFFER_SIZE, ps, STRING_BUFFER_SIZE);
+
+			// set ui rendering function
+			this->window->SetUiRender([this]()
+				{
+					this->RenderUI();
+				});
+
+
 			return true;
 
 		}
 		return false;
+
+
+
 	}
 
 
@@ -679,11 +676,11 @@ namespace Example
 			glLineWidth(10.0f);
 			glPointSize(20.0f);
 
-			glBufferData(GL_ARRAY_BUFFER, triangleMesh.size() * sizeof(glm::vec2), triangleMesh.data(), GL_STATIC_DRAW);
-			glDrawArrays(GL_LINES, 0, this->triangleMesh.size());
+			glBufferData(GL_ARRAY_BUFFER, triangleLines.size() * sizeof(glm::vec2), triangleLines.data(), GL_STATIC_DRAW);
+			glDrawArrays(GL_LINES, 0, this->triangleLines.size());
 
 			glBufferData(GL_ARRAY_BUFFER, triangleMesh.size() * sizeof(glm::vec2), triangleMesh.data(), GL_STATIC_DRAW);
-			glDrawArrays(GL_TRIANGLES, 0, this->triangleMesh.size());
+			glDrawArrays(GL_TRIANGLES, 0, trianglesToDraw);
 
 			glBufferData(GL_ARRAY_BUFFER, pointsInsideHull.size() * sizeof(glm::vec2), pointsInsideHull.data(), GL_STATIC_DRAW);
 			glDrawArrays(GL_POINTS, 0, this->pointsInsideHull.size());
@@ -700,4 +697,41 @@ namespace Example
 
 		}
 	}
+
+	void
+		ExampleApp::RenderUI()
+	{
+		if (this->window->IsOpen())
+		{
+			bool show = true;
+			// create a new window
+			ImGui::Begin("Shader Sources", &show, ImGuiWindowFlags_NoSavedSettings);
+
+			// apply button
+			if (ImGui::Button("Apply"))
+			{
+				// if pressed we compile the shaders
+			}
+			if (this->compilerLog.length())
+			{
+				// if compilation produced any output we display it here
+				ImGui::TextWrapped(this->compilerLog.c_str());
+			}
+
+			// apply button
+			if (ImGui::Button("test"))
+			{
+				// if pressed we compile the shaders
+			}
+
+			ImGui::SliderInt("Triangles to draw", &trianglesToDraw, 0, triangleMesh.size());
+
+			// close window
+			ImGui::End();
+		}
+	}
+
+
 } // namespace Example
+
+

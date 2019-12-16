@@ -73,6 +73,10 @@ namespace Example
 		std::vector<glm::vec2> hull;
 		std::vector<glm::vec2> pointsInsideHull;
 		std::vector<glm::vec2> triangleMesh;
+		std::vector<glm::vec2> triangleLines;
+
+		// DEBUG VARIABLES
+		int trianglesToDraw = 0;
 
 		GLuint program;
 		GLuint vertexShader;
@@ -96,11 +100,13 @@ namespace Example
 
 		void ExampleApp::insertPointsOnLine(Node* tree, glm::vec2 point);
 
-		//void ExampleApp::insertPointsOnLineLeft(Node* tree, glm::vec2 point);
-		//void ExampleApp::insertPointsOnLineRight(Node* tree, glm::vec2 point);
-
-
-
 		bool ExampleApp::onSegment(glm::vec2 start, glm::vec2 point, glm::vec2 end);
+
+		// show some ui things
+		void RenderUI();
+
+		GLchar *vsBuffer;
+		GLchar *fsBuffer;
+		std::string compilerLog;
 	};
 } // namespace Example
